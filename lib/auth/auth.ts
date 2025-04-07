@@ -3,6 +3,7 @@
 import { firebaseAuth } from "@/firebase/firebase";
 import {
   createUserWithEmailAndPassword,
+  getAuth,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
@@ -14,18 +15,18 @@ export async function signUp(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  createUserWithEmailAndPassword(firebaseAuth, data.email, data.password)
-    .then(() => {
-      redirect("/signin");
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
+  try {
+    await createUserWithEmailAndPassword(
+      firebaseAuth,
+      data.email,
+      data.password,
+    );
 
-      console.log(errorCode, errorMessage);
-
-      return;
-    });
+    redirect("/signin");
+  } catch (error) {
+    console.log(error);
+    return;
+  }
 }
 
 export async function signIn(formData: FormData) {
@@ -34,31 +35,34 @@ export async function signIn(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  signInWithEmailAndPassword(firebaseAuth, data.email, data.password)
-    .then(() => {
-      redirect("/home");
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
+  try {
+    await signInWithEmailAndPassword(firebaseAuth, data.email, data.password);
 
-      console.log(errorCode, errorMessage);
-
-      return;
-    });
+    redirect("/");
+  } catch (error) {
+    console.log(error);
+    return;
+  }
 }
 
 export async function signOutUser() {
-  signOut(firebaseAuth)
-    .then(() => {
-      redirect("/signin");
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
+  try {
+    await signOut(firebaseAuth);
 
-      console.log(errorCode, errorMessage);
+    redirect("/signin");
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+}
 
-      return;
-    });
+export async function retrieveUser() {
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (user) {
+    return user;
+  } else {
+    return undefined;
+  }
 }
