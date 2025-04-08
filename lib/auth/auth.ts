@@ -3,7 +3,6 @@
 import { firebaseAuth } from "@/firebase/firebase";
 import {
   createUserWithEmailAndPassword,
-  getAuth,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
@@ -15,18 +14,9 @@ export async function signUp(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  try {
-    await createUserWithEmailAndPassword(
-      firebaseAuth,
-      data.email,
-      data.password,
-    );
+  await createUserWithEmailAndPassword(firebaseAuth, data.email, data.password);
 
-    redirect("/signin");
-  } catch (error) {
-    console.log(error);
-    return;
-  }
+  redirect("/signin");
 }
 
 export async function signIn(formData: FormData) {
@@ -57,8 +47,7 @@ export async function signOutUser() {
 }
 
 export async function retrieveUser() {
-  const auth = getAuth();
-  const user = auth.currentUser;
+  const user = firebaseAuth.currentUser;
 
   if (user) {
     return user;
