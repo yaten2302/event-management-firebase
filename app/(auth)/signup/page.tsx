@@ -1,12 +1,29 @@
+"use client";
+
 import * as React from "react";
 
 import Button from "@/components/form/Button";
 import Input from "@/components/form/Input";
 import NextImage from "@/components/Image";
 import NextLink from "@/components/Link";
+
 import { signUp } from "@/lib/auth/auth";
+import { onAuthStateChanged } from "firebase/auth";
+import { firebaseAuth } from "@/firebase/firebase";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function SignUpForm() {
+  const path = usePathname();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    onAuthStateChanged(firebaseAuth, (user) => {
+      if (user && (path == "/signin" || path == "/signup")) {
+        router.push("/");
+      }
+    });
+  }, [path, router]);
+
   return (
     <main className="bg-[#F1F4FA] flex flex-row h-screen w-screen">
       <div className="bg-white w-[448px] flex flex-col p-8 gap-6">

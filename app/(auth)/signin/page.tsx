@@ -1,14 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import Button from "@/components/form/Button";
 import Input from "@/components/form/Input";
 import NextImage from "@/components/Image";
 import NextLink from "@/components/Link";
 
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "@/firebase/firebase";
 
 export default function SignInForm() {
@@ -16,6 +16,16 @@ export default function SignInForm() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
+
+  const path = usePathname();
+
+  React.useEffect(() => {
+    onAuthStateChanged(firebaseAuth, (user) => {
+      if (user && (path == "/signin" || path == "/signup")) {
+        router.push("/");
+      }
+    });
+  }, [path, router]);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
