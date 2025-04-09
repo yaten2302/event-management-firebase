@@ -1,15 +1,36 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import Button from "@/components/form/Button";
 import Input from "@/components/form/Input";
 import NextImage from "@/components/Image";
 import NextLink from "@/components/Link";
 
-import { signIn } from "@/lib/auth/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { firebaseAuth } from "@/firebase/firebase";
 
-export default function SignUpForm() {
+export default function SignInForm() {
+  const router = useRouter();
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState("");
+
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+
+    signInWithEmailAndPassword(firebaseAuth, email, password)
+      .then((authUser) => {
+        console.log("success" + authUser.user?.email);
+        router.push("/");
+      })
+      .catch((error) => {
+        console.log("error " + error);
+      });
+  };
+
   return (
     <main className="bg-[#F1F4FA] flex flex-row h-screen w-screen">
       <div className="bg-white w-[448px] flex flex-col p-8 gap-6">
@@ -24,13 +45,9 @@ export default function SignUpForm() {
           <h1 className="font-medium text-TitleLarge">Sign In</h1>
         </div>
 
-        <div className="relative text-center my-4 mb-6">
-          <div className="absolute left-1/2 top-1/2 w-[40%] border-b border-gray-300 ml-5"></div>
-          <span className="bg-white px-2 text-gray-500 font-medium">Or</span>
-          <div className="absolute top-1/2 w-[40%] border-b border-gray-300 ml-5"></div>
-        </div>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        <form action={signIn}>
+        <form onSubmit={handleSignIn}>
           <div>
             <div className="mb-4">
               <label className="block text-sm font-medium" htmlFor="email">
@@ -42,6 +59,8 @@ export default function SignUpForm() {
                 className="w-full border mt-[.75rem]"
                 placeholder="you@example.com"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -56,6 +75,8 @@ export default function SignUpForm() {
                 className="w-full border mt-[.75rem]"
                 placeholder="************"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
