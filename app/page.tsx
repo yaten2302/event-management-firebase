@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/form/Button";
+import { useUser } from "@/contexts/userContext";
 import { firebaseAuth } from "@/firebase/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -8,6 +9,9 @@ import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
+  const user = useUser();
+  console.log(user.role);
+
   useEffect(() => {
     onAuthStateChanged(firebaseAuth, (user) => {
       if (user) {
@@ -19,6 +23,7 @@ export default function Home() {
       }
     });
   }, [router]);
+
   return (
     <main>
       <h1>Sign out</h1>
