@@ -1,6 +1,6 @@
 import { fireStore } from "@/firebase/firebase";
 import { BookingRequest, Venue } from "@/types/database/database";
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, addDoc } from "firebase/firestore";
 
 export const fetchAvailableVenues = async (): Promise<Venue[]> => {
   const bookingSnap = await getDocs(collection(fireStore, "BookingRequest"));
@@ -30,3 +30,17 @@ export const fetchAvailableVenues = async (): Promise<Venue[]> => {
 
   return availableVenues;
 };
+
+export async function createBookingRequest(data: BookingRequest) {
+  try {
+    const docRef = await addDoc(collection(fireStore, "BookingRequest"), {
+      ...data,
+    });
+    console.log("Document written with ID: ", docRef.id);
+
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating booking request:", error);
+    throw error;
+  }
+}
